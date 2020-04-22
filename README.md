@@ -7,7 +7,7 @@ Installation
 2. Clone the repository to local 
 
     ```
-    git clone https://github.com/DINGDAMU/P4LogLog.git    
+    git clone https://github.com/P4app-repo/INDDoS.git    
     ```
 
 3. ```
