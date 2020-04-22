@@ -164,7 +164,6 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
         size = 1024;
     }
     apply {
-        ipv4_lpm.apply();
         // Index in Count-min sketch (Size 1024)
         bit<10> hash_32_1;
         bit<10> hash_32_2;
@@ -194,13 +193,21 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
         // 1: Report hdr.ipv4.dstAddr to controller
         bit<1> digest_type;
 
+    /* Stage 0 */
+        ipv4_lpm.apply();
+        
+
+    /* Stage 1 */
         //crc32_custom: 
         // Please refer to the paer how to customize CRC32
         hash(hash_32_1, HashAlgorithm.crc32, 1w0, {hdr.ipv4.dstAddr}, 10w1023);
         hash(hash_32_2, HashAlgorithm.crc32_custom, 1w0, {hdr.ipv4.dstAddr}, 10w1023);
+
+    /* Stage 2 */
         hash(hash_32_3, HashAlgorithm.crc32_custom, 1w0, {hdr.ipv4.dstAddr}, 10w1023);
         hash(bm_hash, HashAlgorithm.crc32, 1w0, {hdr.ipv4.srcAddr}, 10w1023);
         
+    /* Stage 3 */
         index1[9:0] = bm_hash;
         index2[9:0] = bm_hash;
         index2[9:0] = bm_hash;
@@ -209,6 +216,8 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
         index2[16:10] = hash_32_2[6:0];
         index3[16:10] = hash_32_3[6:0];
 
+
+    /* Stage 4 */
         if(hash_32_1[9:7] == 0){
              cms1_0.read(res1, index1);
              if(res1==0){
@@ -229,7 +238,9 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              if(res1==0){
              cms1_3.write(index1, 1);
              }
-        }else if(hash_32_1[9:7] == 4){
+        }
+    /* Stage 5 */
+        else if(hash_32_1[9:7] == 4){
              cms1_4.read(res1, index1);
              if(res1==0){
              cms1_4.write(index1, 1);
@@ -251,6 +262,7 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              }
         }
 
+    /* Stage 6 */
         if(hash_32_2[9:7] == 0){
              cms2_0.read(res2, index2);
              if(res2==0){
@@ -271,7 +283,9 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              if(res2==0){
              cms2_3.write(index2, 1);
              }
-        }else if(hash_32_2[9:7] == 4){
+        }
+    /* Stage 7 */
+        else if(hash_32_2[9:7] == 4){
              cms2_4.read(res2, index2);
              if(res2==0){
              cms2_4.write(index2, 1);
@@ -293,6 +307,8 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              }
         }
 
+    
+    /* Stage 8 */
         if(hash_32_3[9:7] == 0){
              cms3_0.read(res3, index3);
              if(res3==0){
@@ -313,7 +329,9 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              if(res3==0){
              cms3_3.write(index3, 1);
              }
-        }else if(hash_32_3[9:7] == 4){
+        }
+    /* Stage 9 */
+        else if(hash_32_3[9:7] == 4){
              cms3_4.read(res3, index3);
              if(res3==0){
              cms3_4.write(index3, 1);
@@ -334,6 +352,7 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              cms3_7.write(index3, 1);
              }
         }
+    /* Stage 10*/
         if(res1 == 0){
             occSlots1.read(value_1, (bit<32>)hash_32_1);
             value_1 = value_1 + 1;
@@ -352,6 +371,8 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
             occSlots3.write((bit<32>)hash_32_3, value_3);
         }
 
+
+    /* Stage 11 */
         d12 = value_1 - value_2;
         d13 = value_1 - value_3;
         d23 = value_2 - value_3;
