@@ -199,7 +199,7 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
 
     /* Stage 1 */
         //crc32_custom: 
-        // Please refer to the paer how to customize CRC32
+        // Please refer to the paper how to customize CRC32
         hash(hash_32_1, HashAlgorithm.crc32, 1w0, {hdr.ipv4.dstAddr}, 10w1023);
         hash(hash_32_2, HashAlgorithm.crc32_custom, 1w0, {hdr.ipv4.dstAddr}, 10w1023);
 
@@ -353,20 +353,20 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
              }
         }
     /* Stage 10*/
+        occSlots1.read(value_1, (bit<32>)hash_32_1);
         if(res1 == 0){
-            occSlots1.read(value_1, (bit<32>)hash_32_1);
             value_1 = value_1 + 1;
             occSlots1.write((bit<32>)hash_32_1, value_1);
         }
 
+        occSlots2.read(value_2, (bit<32>)hash_32_2);
         if(res2 == 0){
-            occSlots2.read(value_2, (bit<32>)hash_32_2);
             value_2 = value_2 + 1;
             occSlots2.write((bit<32>)hash_32_2, value_2);
         }
 
+        occSlots3.read(value_3, (bit<32>)hash_32_3);
         if(res3 == 0){
-            occSlots3.read(value_3, (bit<32>)hash_32_3);
             value_3 = value_3 + 1;
             occSlots3.write((bit<32>)hash_32_3, value_3);
         }
