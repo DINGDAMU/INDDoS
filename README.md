@@ -1,3 +1,15 @@
+Citation
+--------
+```
+@article{ding2021innetwork,
+  title={In-Network Volumetric DDoS Victim Identification Using Programmable Commodity Switches},
+  author={Ding, Damu and Savi, Marco and Pederzolli, Federico and Mauro, Campanella and Siracusa, Domenico},
+  journal={IEEE Transactions on Network and Service Management},
+  year={2021},
+  publisher={IEEE}
+}
+```
+
 Installation
 ------------
 
