@@ -10,8 +10,8 @@ Citation
 }
 ```
 INDDoS has been implemented in two different testbeds:
-* Bmv2 (available in the folder INDDoS.p4app)
-* Tofino (available in the folder INDDoS\_TNA)
+* Bmv2 (v1model, available in the folder INDDoS.p4app)
+* Tofino (TNA, available in the folder INDDoS\_TNA)
 
 # Bmv2
 
